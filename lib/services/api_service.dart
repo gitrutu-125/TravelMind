@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // Android emulator:
-  static const String baseUrl = 'http://192.168.43.103:8000';
+  static const String baseUrl = 'http://192.168.43.135:8000';
 
   Future<Map<String, dynamic>> post(
     String endpoint,

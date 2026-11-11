@@ -1,22 +1,34 @@
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import 'package:trip_planner/l10n/app_localizations.dart';
 //import 'package:trip_planner/screens/home/home_screen.dart';
+//import 'package:trip_planner/screens/language/language_selection_screen.dart';
 
 import 'screens/auth/login_screen.dart';
+import 'services/locale_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Hive
   await Hive.initFlutter();
+
+  // Open settings box
   await Hive.openBox('settings');
+
+  // Load the previously selected language
+  await LocaleService.loadSavedLanguage();
 
   runApp(const TravelMindApp());
 }
 
 // ============================================================
-// APP THEME
+// APP THEME + MULTILINGUAL CONFIGURATION
 // ============================================================
 
 class TravelMindApp extends StatelessWidget {
@@ -27,16 +39,39 @@ class TravelMindApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TravelMind',
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-        colorScheme: ColorScheme.fromSeed(seedColor: primary),
-        scaffoldBackgroundColor: const Color(0xFFF8F8FF),
-      ),
-      home: const SplashScreen(),
+    return ValueListenableBuilder<Locale>(
+      valueListenable: LocaleService.localeNotifier,
+      builder: (context, currentLocale, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'TravelMind',
+
+          // Currently selected app language
+          locale: currentLocale,
+
+          // Supported languages
+          supportedLocales: AppLocalizations.supportedLocales,
+
+          // Localization delegates
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+
+          theme: ThemeData(
+            useMaterial3: true,
+            fontFamily: 'Roboto',
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: primary,
+            ),
+            scaffoldBackgroundColor: const Color(0xFFF8F8FF),
+          ),
+
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:trip_planner/l10n/app_localizations.dart';
 
 import '../saved/saved_trips_screen.dart';
 import '../profile/profile_screen.dart';
@@ -50,43 +50,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Map<String, dynamic>> features = [
     {
-      'title': 'AI Trip Planner',
-      'subtitle': 'Create your perfect trip',
       'icon': Icons.map_rounded,
       'color': Color(0xFF5146C8),
       'screen': 'AI Trip Planner',
     },
     {
-      'title': 'Mood Planner',
-      'subtitle': 'Travel with your mood',
       'icon': Icons.mood_rounded,
       'color': Color(0xFFE6A23C),
       'screen': 'Mood-Based Planner',
     },
     {
-      'title': 'Companionship',
-      'subtitle': 'Find travel buddies',
       'icon': Icons.groups_rounded,
       'color': Color(0xFF3985D9),
       'screen': 'AI Companionship',
     },
     {
-      'title': 'Packing Assistant',
-      'subtitle': 'Pack smartly with AI',
       'icon': Icons.luggage_rounded,
       'color': Color(0xFF269C85),
       'screen': 'AI Packing Assistant',
     },
     {
-      'title': '360° View',
-      'subtitle': 'Explore places virtually',
       'icon': Icons.threesixty_rounded,
       'color': Color(0xFF299BC8),
       'screen': '360° Destination View',
     },
     {
-      'title': 'Traffic Map',
-      'subtitle': 'Discover better routes',
       'icon': Icons.traffic_rounded,
       'color': Color(0xFFE45B69),
       'screen': 'Traffic Detection',
@@ -112,6 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final pages = [
       buildHomePage(),
       const SavedTripsScreen(),
@@ -120,11 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: background,
-
       body: SafeArea(
         child: pages[selectedIndex],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: (index) {
@@ -144,18 +132,18 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         elevation: 12,
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Home',
+            icon: const Icon(Icons.home_rounded),
+            label: l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_rounded),
-            label: 'Saved',
+            icon: const Icon(Icons.bookmark_rounded),
+            label: l10n.saved,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_rounded),
-            label: 'Profile',
+            icon: const Icon(Icons.person_rounded),
+            label: l10n.profile,
           ),
         ],
       ),
@@ -167,6 +155,33 @@ class _HomeScreenState extends State<HomeScreen> {
   // ==========================================================
 
   Widget buildHomePage() {
+    final l10n = AppLocalizations.of(context)!;
+
+    final featureTitles = [
+      l10n.aiTripPlanner,
+      l10n.moodPlanner,
+      l10n.companionship,
+      l10n.packingAssistant,
+      l10n.destination360View,
+      l10n.trafficMap,
+    ];
+
+    final featureSubtitles = [
+      l10n.createPerfectTrip,
+      l10n.travelWithYourMood,
+      l10n.findTravelBuddies,
+      l10n.packSmartlyWithAI,
+      l10n.explorePlacesVirtually,
+      l10n.discoverBetterRoutes,
+    ];
+
+    final destinationSubtitles = {
+      'Goa': l10n.beachesAndAdventure,
+      'Manali': l10n.mountainsAndNature,
+      'Jaipur': l10n.cultureAndHeritage,
+      'Kerala': l10n.natureAndBackwaters,
+    };
+
     final filteredDestinations = destinations.where((destination) {
       return destination['name']
           .toString()
@@ -179,38 +194,40 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // ==================================================
           // WELCOME HEADER
           // ==================================================
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Hello, Traveller! 👋',
-                    style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold,
-                      color: darkBlue,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.helloTraveller,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: darkBlue,
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  Text(
-                    'Ready for your next adventure?',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade600,
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.readyForAdventure,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-
+              const SizedBox(width: 12),
               GestureDetector(
                 onTap: () {
                   setState(() {
@@ -248,9 +265,9 @@ class _HomeScreenState extends State<HomeScreen> {
           // SEARCH BAR
           // ==================================================
 
-          const Text(
-            'Where do you want to go?',
-            style: TextStyle(
+          Text(
+            l10n.whereToGo,
+            style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
               color: darkBlue,
@@ -265,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() {});
             },
             decoration: InputDecoration(
-              hintText: 'Search Goa, Manali, Jaipur...',
+              hintText: l10n.searchDestinations,
               hintStyle: TextStyle(
                 color: Colors.grey.shade500,
                 fontSize: 13,
@@ -319,7 +336,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
           Container(
             width: double.infinity,
-            height: 270,
+            constraints: const BoxConstraints(
+              minHeight: 270,
+            ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
@@ -333,30 +352,33 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
               child: Stack(
-                fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1000',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: primary,
-                      );
-                    },
+                  Positioned.fill(
+                    child: Image.network(
+                      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1000',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: primary,
+                        );
+                      },
+                    ),
                   ),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFF17165C)
-                              .withValues(alpha: 0.95),
-                          const Color(0xFF5146C8)
-                              .withValues(alpha: 0.65),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF17165C)
+                                .withValues(alpha: 0.95),
+                            const Color(0xFF5146C8)
+                                .withValues(alpha: 0.65),
+                            Colors.transparent,
+                          ],
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                        ),
                       ),
                     ),
                   ),
@@ -364,6 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.all(22),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -376,22 +399,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.auto_awesome_rounded,
                                 color: Colors.white,
                                 size: 15,
                               ),
-                              SizedBox(width: 6),
-                              Text(
-                                'AI POWERED TRAVEL',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  l10n.aiPoweredTravel,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
+                                  ),
                                 ),
                               ),
                             ],
@@ -400,21 +425,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         const SizedBox(height: 15),
 
-                        const Text(
-                          'Plan Your Dream Trip!',
-                          style: TextStyle(
+                        Text(
+                          l10n.planDreamTrip,
+                          style: const TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            height: 1.2,
                           ),
                         ),
 
                         const SizedBox(height: 8),
 
-                        const Text(
-                          'Discover amazing places and create '
-                          'your personalized travel itinerary.',
-                          style: TextStyle(
+                        Text(
+                          l10n.discoverAmazingPlaces,
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
                             height: 1.5,
@@ -425,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         ElevatedButton(
                           onPressed: () {
-                            openFeature('AI Trip Planner');
+                            openFeature(l10n.aiTripPlanner);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -438,17 +463,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                'Start Planning',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                              Flexible(
+                                child: Text(
+                                  l10n.startPlanning,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              Icon(
+                              const SizedBox(width: 8),
+                              const Icon(
                                 Icons.arrow_forward_rounded,
                                 size: 18,
                               ),
@@ -470,17 +497,20 @@ class _HomeScreenState extends State<HomeScreen> {
           // ==================================================
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Explore TravelMind',
-                style: TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: darkBlue,
+              Expanded(
+                child: Text(
+                  l10n.exploreTravelMind,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: darkBlue,
+                  ),
                 ),
               ),
-
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -490,9 +520,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: const Color(0xFFECEAFF),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  '6 Features',
-                  style: TextStyle(
+                child: Text(
+                  l10n.featuresCount,
+                  style: const TextStyle(
                     fontSize: 11,
                     color: primary,
                     fontWeight: FontWeight.bold,
@@ -513,7 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 13,
               mainAxisSpacing: 13,
-              childAspectRatio: 1.12,
+              mainAxisExtent: 205,
             ),
             itemBuilder: (context, index) {
               final feature = features[index];
@@ -524,10 +554,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
-                    openFeature(feature['screen']);
+                    openFeature(featureTitles[index]);
                   },
                   child: Ink(
-                    padding: const EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(13),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -549,50 +579,65 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 44,
-                          width: 44,
-                          decoration: BoxDecoration(
-                            color: featureColor.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Icon(
-                            feature['icon'],
-                            color: featureColor,
-                            size: 26,
-                          ),
-                        ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 44,
+                                  width: 44,
+                                  decoration: BoxDecoration(
+                                    color: featureColor.withValues(
+                                      alpha: 0.15,
+                                    ),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Icon(
+                                    feature['icon'],
+                                    color: featureColor,
+                                    size: 26,
+                                  ),
+                                ),
 
-                        const SizedBox(height: 12),
+                                const SizedBox(height: 10),
 
-                        Text(
-                          feature['title'],
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: darkBlue,
+                                Text(
+                                  featureTitles[index],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: darkBlue,
+                                    height: 1.25,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 5),
+
+                                Text(
+                                  featureSubtitles[index],
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey.shade600,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-
-                        const SizedBox(height: 5),
-
-                        Text(
-                          feature['subtitle'],
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey.shade600,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -607,25 +652,27 @@ class _HomeScreenState extends State<HomeScreen> {
           // ==================================================
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Popular Destinations',
-                style: TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                  color: darkBlue,
+              Expanded(
+                child: Text(
+                  l10n.popularDestinations,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: darkBlue,
+                  ),
                 ),
               ),
-
               TextButton(
                 onPressed: () {
                   searchController.clear();
                   setState(() {});
                 },
-                child: const Text(
-                  'View all',
-                  style: TextStyle(
+                child: Text(
+                  l10n.viewAll,
+                  style: const TextStyle(
                     color: primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -638,12 +685,12 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
 
           if (filteredDestinations.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 25),
               child: Center(
                 child: Text(
-                  'No destinations found.',
-                  style: TextStyle(color: Colors.grey),
+                  l10n.noDestinationsFound,
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
             )
@@ -720,7 +767,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(height: 5),
 
                                 Text(
-                                  destination['subtitle'],
+                                  destinationSubtitles[
+                                          destination['name']] ??
+                                      destination['subtitle'],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 11,
                                     color: Colors.white,
@@ -729,18 +780,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                 const SizedBox(height: 9),
 
-                                const Row(
+                                Row(
                                   children: [
-                                    Text(
-                                      'Explore destination',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
+                                    Flexible(
+                                      child: Text(
+                                        l10n.exploreDestination,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                    SizedBox(width: 5),
-                                    Icon(
+                                    const SizedBox(width: 5),
+                                    const Icon(
                                       Icons.arrow_forward_rounded,
                                       size: 14,
                                       color: Colors.white,
@@ -781,32 +836,32 @@ class _HomeScreenState extends State<HomeScreen> {
               color: const Color(0xFFECEAFF),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.explore_rounded,
                   color: primary,
                   size: 35,
                 ),
 
-                SizedBox(width: 13),
+                const SizedBox(width: 13),
 
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Adventure is calling!',
-                        style: TextStyle(
+                        l10n.adventureCalling,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: darkBlue,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Explore new places and make memories.',
-                        style: TextStyle(
+                        l10n.exploreNewPlaces,
+                        style: const TextStyle(
                           fontSize: 11,
                           color: Color(0xFF666480),
                         ),
@@ -839,6 +894,8 @@ class FeaturePlaceholderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8FF),
       appBar: AppBar(
@@ -872,11 +929,10 @@ class FeaturePlaceholderScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              const Text(
-                'This feature will be developed in the '
-                'upcoming TravelMind development phase.',
+              Text(
+                l10n.featureComingSoon,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
                   height: 1.5,

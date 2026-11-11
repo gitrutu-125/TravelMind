@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'package:trip_planner/l10n/app_localizations.dart';
+
 import '../home/home_screen.dart';
+import '../../services/locale_service.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
@@ -14,20 +17,32 @@ class LanguageSelectionScreen extends StatefulWidget {
 
 class _LanguageSelectionScreenState
     extends State<LanguageSelectionScreen> {
-
   static const Color primary = Color(0xFF5146C8);
   static const Color darkBlue = Color(0xFF17165C);
 
-  final List<Map<String, String>> languages = [
-    {'name': 'English', 'native': 'English', 'code': 'en'},
-    {'name': 'Hindi', 'native': 'हिन्दी', 'code': 'hi'},
-    {'name': 'Marathi', 'native': 'मराठी', 'code': 'mr'},
-    {'name': 'Tamil', 'native': 'தமிழ்', 'code': 'ta'},
-    {'name': 'Telugu', 'native': 'తెలుగు', 'code': 'te'},
-    {'name': 'Gujarati', 'native': 'ગુજરાતી', 'code': 'gu'},
-  ];
-
   String selectedLanguage = 'en';
+
+  // Only English, Hindi and Marathi
+  final List<Map<String, String>> languages = [
+    {
+      'code': 'en',
+      'name': 'English',
+      'native': 'English',
+      'flag': '🇬🇧',
+    },
+    {
+      'code': 'hi',
+      'name': 'Hindi',
+      'native': 'हिन्दी',
+      'flag': '🇮🇳',
+    },
+    {
+      'code': 'mr',
+      'name': 'Marathi',
+      'native': 'मराठी',
+      'flag': '🇮🇳',
+    },
+  ];
 
   @override
   void initState() {
@@ -35,21 +50,23 @@ class _LanguageSelectionScreenState
 
     final box = Hive.box('settings');
 
+    final savedLanguage = box.get(
+      'languageCode',
+      defaultValue: 'en',
+    ) as String;
+
+    // Use English if an old unsupported language is saved.
     selectedLanguage =
-        box.get('languageCode', defaultValue: 'en');
+        LocaleService.supportedLanguageCodes.contains(savedLanguage)
+            ? savedLanguage
+            : 'en';
   }
 
-  // ==========================================================
-  // SAVE LANGUAGE AND NAVIGATE TO HOME SCREEN
-  // ==========================================================
+  Future<void> continueWithLanguage() async {
+    await LocaleService.changeLanguage(selectedLanguage);
 
-  void continueWithLanguage() {
-    final box = Hive.box('settings');
+    if (!mounted) return;
 
-    // Save selected language in Hive.
-    box.put('languageCode', selectedLanguage);
-
-    // Navigate to HomeScreen.
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -60,216 +77,229 @@ class _LanguageSelectionScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8FF),
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFE9EDFF),
-              Color(0xFFF8F0FF),
-              Colors.white,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 25,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            keyboardDismissBehavior:
+                ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 25,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 450,
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 450,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 85,
-                      width: 85,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: primary.withValues(alpha: 0.12),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5),
-                          ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // LANGUAGE ICON
+                  Container(
+                    height: 85,
+                    width: 85,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF5146C8),
+                          Color(0xFF8177E8),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.language_rounded,
-                        size: 48,
-                        color: primary,
-                      ),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withValues(alpha: 0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 7),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 22),
-
-                    const Text(
-                      'Choose Your Language',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 27,
-                        fontWeight: FontWeight.w900,
-                        color: darkBlue,
-                      ),
+                    child: const Icon(
+                      Icons.language_rounded,
+                      color: Colors.white,
+                      size: 43,
                     ),
+                  ),
 
-                    const SizedBox(height: 10),
+                  const SizedBox(height: 25),
 
-                    const Text(
-                      'Select your preferred language '
-                      'for a personalized travel experience.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                        height: 1.6,
-                      ),
+                  // HEADING
+                  Text(
+                    l10n.chooseLanguage,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: const TextStyle(
+                      fontSize: 27,
+                      fontWeight: FontWeight.bold,
+                      color: darkBlue,
                     ),
+                  ),
 
-                    const SizedBox(height: 32),
+                  const SizedBox(height: 10),
 
-                    // LANGUAGE OPTIONS
+                  // DESCRIPTION
+                  Text(
+                    l10n.selectLanguageDescription,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
 
-                    ...languages.map((language) {
-                      final isSelected =
-                          selectedLanguage == language['code'];
+                  const SizedBox(height: 28),
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedLanguage =
-                                language['code']!;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration:
-                              const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.only(bottom: 13),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 17,
-                          ),
-                          decoration: BoxDecoration(
+                  // LANGUAGE OPTIONS
+                  ...languages.map((language) {
+                    final isSelected =
+                        selectedLanguage == language['code'];
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedLanguage = language['code']!;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 17,
+                          vertical: 17,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? primary.withValues(alpha: 0.08)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(17),
+                          border: Border.all(
                             color: isSelected
-                                ? const Color(0xFFEDEAFF)
-                                : Colors.white,
-                            borderRadius:
-                                BorderRadius.circular(17),
-                            border: Border.all(
-                              color: isSelected
-                                  ? primary
-                                  : const Color(0xFFE5E3F5),
-                              width: isSelected ? 2 : 1,
+                                ? primary
+                                : Colors.grey.shade200,
+                            width: isSelected ? 1.8 : 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.025),
+                              blurRadius: 7,
+                              offset: const Offset(0, 3),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: primary.withValues(
-                                  alpha: isSelected ? 0.08 : 0.03,
-                                ),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      language['native']!,
-                                      style: const TextStyle(
-                                        fontSize: 19,
-                                        fontWeight: FontWeight.bold,
-                                        color: darkBlue,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      language['name']!,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              Icon(
-                                isSelected
-                                    ? Icons.check_circle_rounded
-                                    : Icons.circle_outlined,
-                                color: isSelected
-                                    ? primary
-                                    : Colors.grey.shade400,
-                                size: 24,
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      );
-                    }),
-
-                    const SizedBox(height: 20),
-
-                    // CONTINUE BUTTON
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: continueWithLanguage,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          foregroundColor: Colors.white,
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
+                        child: Row(
                           children: [
                             Text(
-                              'Continue',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
+                              language['flag']!,
+                              style: const TextStyle(fontSize: 25),
+                            ),
+
+                            const SizedBox(width: 14),
+
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    language['name']!,
+                                    softWrap: true,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: darkBlue,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    language['native']!,
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(width: 10),
-                            Icon(Icons.arrow_forward_rounded),
+
+                            const SizedBox(width: 8),
+
+                            Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_off,
+                              color: isSelected
+                                  ? primary
+                                  : Colors.grey.shade400,
+                              size: 22,
+                            ),
                           ],
                         ),
                       ),
-                    ),
+                    );
+                  }),
 
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
-                    const Text(
-                      'You can change your language later '
-                      'in settings.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black45,
+                  // CONTINUE BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: continueWithLanguage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              l10n.continueButton,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 9),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 20,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // LANGUAGE CHANGE NOTE
+                  Text(
+                    l10n.languageChangeNote,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.4,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
