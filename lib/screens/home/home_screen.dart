@@ -3,6 +3,7 @@ import 'package:trip_planner/l10n/app_localizations.dart';
 
 import '../saved/saved_trips_screen.dart';
 import '../profile/profile_screen.dart';
+import '../trip/trip_planning_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -88,14 +89,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void openFeature(String screenName) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FeaturePlaceholderScreen(
-          title: screenName,
+    final l10n = AppLocalizations.of(context)!;
+
+    // Open the actual AI Trip Planner screen.
+    if (screenName == l10n.aiTripPlanner) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const TripPlanningScreen(),
         ),
-      ),
-    );
+      );
+    } else {
+      // Keep all other features working as before.
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => FeaturePlaceholderScreen(
+            title: screenName,
+          ),
+        ),
+      );
+    }
   }
 
   @override

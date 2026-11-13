@@ -10,7 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     DATABASE_URL: str
+
     GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_MAPS_API_KEY: str | None = None
+
     SECRET_KEY: str
 
     ALGORITHM: str = "HS256"

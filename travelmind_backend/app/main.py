@@ -1,10 +1,12 @@
 
 from fastapi import FastAPI
+
 from app.database import Base, engine
-from app.routers import auth
+from app.routers import auth, trips
 
 # Import models so SQLAlchemy knows about them.
 from app.models.user import User
+
 
 app = FastAPI(
     title="TravelMind API",
@@ -12,8 +14,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
 Base.metadata.create_all(bind=engine)
+
+# Existing authentication router
 app.include_router(auth.router)
+
+# New trip planning router
+app.include_router(trips.router)
+
 
 @app.get("/")
 def home():
